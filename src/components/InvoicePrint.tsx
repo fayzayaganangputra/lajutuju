@@ -132,7 +132,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
             {/* Logo & Info */}
             <div className="flex items-start justify-between mb-6 pb-4 border-b-2 border-orange-600">
               <div>
-                <img src="logo.png" alt="Logo Laju Tuju" className="w-44 h-44 object-contain block" />
+                <img src="logo.png" alt="Logo Laju Tuju" className="w-44 h-auto object-contain block" />
                 <div className="text-sm text-gray-600 leading-tight mt-2">
                   <p>Soka Asri Permai, Kadisoka, Purwomartani, Kalasan Sleman</p>
                   <p>Telp: 082138568822</p>
