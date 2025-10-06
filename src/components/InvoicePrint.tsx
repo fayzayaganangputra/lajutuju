@@ -95,7 +95,6 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white w-full max-w-4xl my-8 rounded-lg shadow-2xl overflow-y-auto max-h-[95vh]">
-        {/* Header */}
         <div className="p-4 border-b border-gray-200 flex justify-between items-center print:hidden">
           <h2 className="text-xl font-bold text-gray-900">Preview Invoice</h2>
           <div className="flex gap-2">
@@ -120,10 +119,8 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
           </div>
         </div>
 
-        {/* Invoice Content */}
         <div className="p-6 print:p-12" ref={invoiceRef} id="invoice-content">
           <div className="border-4 border-orange-600 rounded-lg p-6" style={{ width: '100%' }}>
-            {/* Logo & Info */}
             <div className="flex items-start justify-between mb-6 pb-4 border-b-2 border-orange-600">
               <div>
                 <img src="logo.png" alt="Logo Laju Tuju" className="w-44 h-auto object-contain block" />
@@ -131,7 +128,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   <p>Soka Asri Permai, Kadisoka, Purwomartani, Kalasan Sleman</p>
                   <p>
                     Telp:{' '}
-                    <span style={{ textDecoration: 'none' }}>{order.customer_phone}</span>
+                    <span className="no-underline-numbers">{order.customer_phone}</span>
                   </p>
                   <p>
                     Email:{' '}
@@ -153,7 +150,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   <p className="text-gray-600">
                     <span className="font-semibold">No. Invoice:</span>
                     <br />
-                    <span style={{ fontFamily: 'monospace', fontWeight: 600, textDecoration: 'none' }}>
+                    <span className="no-underline-numbers" style={{ fontFamily: 'monospace', fontWeight: 600 }}>
                       #{order.id.substring(0, 8).toUpperCase()}
                     </span>
                   </p>
@@ -166,7 +163,6 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             </div>
 
-            {/* Pelanggan & Periode */}
             <div className="grid grid-cols-2 gap-6 mb-6 pb-4 border-b border-gray-300">
               <div>
                 <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Informasi Pelanggan</h3>
@@ -174,7 +170,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   <p className="text-gray-600 font-semibold">{order.customer_name}</p>
                   <p className="text-gray-600">
                     <span className="font-medium">Telepon:</span>{' '}
-                    <span style={{ textDecoration: 'none' }}>{order.customer_phone}</span>
+                    <span className="no-underline-numbers">{order.customer_phone}</span>
                   </p>
                   {order.customer_address && (
                     <p className="text-gray-600">
@@ -198,7 +194,6 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             </div>
 
-            {/* Rincian Item */}
             <div className="mb-6">
               <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Rincian Item Sewa</h3>
               <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
@@ -227,7 +222,6 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             </div>
 
-            {/* Total */}
             <div className="flex justify-end mb-6">
               <div className="w-full max-w-md">
                 <div className="bg-orange-600 text-white p-4 rounded-lg flex justify-between items-center">
@@ -237,20 +231,18 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             </div>
 
-            {/* Informasi Pembayaran */}
             <div className="mb-6 pb-4 border-b border-gray-300">
               <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Informasi Pembayaran</h3>
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-gray-700 space-y-1">
                 <p><span className="font-medium">Bank:</span> BCA</p>
                 <p>
                   <span className="font-medium">No. Rekening:</span>{' '}
-                  <span style={{ fontFamily: 'monospace', fontWeight: 600, textDecoration: 'none' }}>4561059637</span>
+                  <span className="no-underline-numbers" style={{ fontFamily: 'monospace', fontWeight: 600 }}>4561059637</span>
                 </p>
                 <p><span className="font-medium">Atas Nama:</span> Moh Fajar Yogyaning Praharu</p>
               </div>
             </div>
 
-            {/* Catatan */}
             {order.notes && (
               <div className="mb-6 pb-4 border-b border-gray-300">
                 <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Catatan</h3>
@@ -258,7 +250,6 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             )}
 
-            {/* QR Code */}
             <div className="grid grid-cols-2 gap-6 text-center mb-4">
               <div>
                 <p className="text-sm text-gray-600 mb-2">Laju Tuju</p>
@@ -269,13 +260,42 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
         </div>
       </div>
 
-      {/* Print CSS */}
       <style>{`
+        .no-underline-numbers {
+          text-decoration: none !important;
+          text-decoration-line: none !important;
+          text-decoration-style: none !important;
+          -webkit-text-decoration: none !important;
+          -webkit-text-decoration-line: none !important;
+          color: inherit !important;
+          pointer-events: none;
+        }
+
+        .no-underline-numbers a {
+          text-decoration: none !important;
+          color: inherit !important;
+          pointer-events: none;
+        }
+
+        #invoice-content a[href^="tel:"] {
+          text-decoration: none !important;
+          color: inherit !important;
+          pointer-events: none;
+        }
+
         @media print {
           body * { visibility: hidden; }
           #invoice-content, #invoice-content * { visibility: visible; }
           #invoice-content { position: absolute; left: 0; top: 0; width: 100%; }
           .print\\:hidden { display: none !important; }
+          .no-underline-numbers {
+            text-decoration: none !important;
+            -webkit-text-decoration: none !important;
+          }
+          a[href^="tel:"] {
+            text-decoration: none !important;
+            color: inherit !important;
+          }
         }
       `}</style>
     </div>
