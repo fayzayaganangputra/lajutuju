@@ -30,13 +30,9 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
 
   const handleDownloadPDF = async () => {
     if (!invoiceRef.current) return;
-
     const invoiceElement = invoiceRef.current;
-
-    // simpan style asli
     const originalStyles = { ...invoiceElement.style };
 
-    // paksa layout agar PDF tidak gepeng
     invoiceElement.style.position = 'absolute';
     invoiceElement.style.left = '-9999px';
     invoiceElement.style.top = '0';
@@ -48,7 +44,6 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     try {
-      // gunakan "as any" untuk mengatasi error scale di TypeScript
       const canvas = await html2canvas(invoiceElement, {
         scale: 2,
         useCORS: true,
@@ -93,7 +88,6 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
       console.error('Error generating PDF:', error);
       alert('Gagal membuat PDF. Silakan coba lagi.');
     } finally {
-      // kembalikan style asli
       Object.assign(invoiceElement.style, originalStyles);
     }
   };
@@ -135,7 +129,10 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                 <img src="logo.png" alt="Logo Laju Tuju" className="w-44 h-auto object-contain block" />
                 <div className="text-sm text-gray-600 leading-tight mt-2">
                   <p>Soka Asri Permai, Kadisoka, Purwomartani, Kalasan Sleman</p>
-                  <p>Telp: 082138568822</p>
+                  <p>
+                    Telp:{' '}
+                    <span className="no-underline decoration-none">{order.customer_phone}</span>
+                  </p>
                   <p>
                     Email:{' '}
                     <a href="mailto:contact@lajutuju.com" className="ml-1 text-blue-500 underline hover:text-blue-700">
@@ -156,7 +153,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   <p className="text-gray-600">
                     <span className="font-semibold">No. Invoice:</span>
                     <br />
-                    <span className="font-mono text-gray-900">#{order.id.substring(0, 8).toUpperCase()}</span>
+                    <span className="font-mono text-gray-900 no-underline decoration-none">#{order.id.substring(0, 8).toUpperCase()}</span>
                   </p>
                   <p className="text-gray-600">
                     <span className="font-semibold">Tanggal:</span>
@@ -174,7 +171,8 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                 <div className="space-y-1 text-sm">
                   <p className="text-gray-600 font-semibold">{order.customer_name}</p>
                   <p className="text-gray-600">
-                    <span className="font-medium">Telepon:</span> {order.customer_phone}
+                    <span className="font-medium">Telepon:</span>{' '}
+                    <span className="no-underline decoration-none">{order.customer_phone}</span>
                   </p>
                   {order.customer_address && (
                     <p className="text-gray-600">
@@ -242,7 +240,10 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Informasi Pembayaran</h3>
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-gray-700 space-y-1">
                 <p><span className="font-medium">Bank:</span> BCA</p>
-                <p><span className="font-medium">No. Rekening:</span> <span className="font-mono font-semibold">4561059637</span></p>
+                <p>
+                  <span className="font-medium">No. Rekening:</span>{' '}
+                  <span className="font-mono font-semibold no-underline decoration-none">4561059637</span>
+                </p>
                 <p><span className="font-medium">Atas Nama:</span> Moh Fajar Yogyaning Praharu</p>
               </div>
             </div>
