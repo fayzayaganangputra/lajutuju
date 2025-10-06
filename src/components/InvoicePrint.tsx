@@ -20,44 +20,47 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(amount);
-  };
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => window.print();
 
   const handleDownloadPDF = async () => {
     if (!invoiceRef.current) return;
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const scale = window.devicePixelRatio || 2;
+    // Simpan style asli
+    const originalWidth = invoiceRef.current.style.width;
+    const originalMaxWidth = invoiceRef.current.style.maxWidth;
 
+    // Pastikan lebar elemen full agar tidak gepeng
+    invoiceRef.current.style.width = '100%';
+    invoiceRef.current.style.maxWidth = 'none';
+
+    const scale = 3; // tinggi supaya tajam di HP
+
+    // Pakai 'as any' supaya TypeScript tidak complain
     const canvas = await html2canvas(invoiceRef.current, {
       scale,
       useCORS: true,
       allowTaint: true,
       scrollY: -window.scrollY,
-    });
+    } as any);
+
+    // Kembalikan style asli
+    invoiceRef.current.style.width = originalWidth;
+    invoiceRef.current.style.maxWidth = originalMaxWidth;
 
     const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
     const imgWidth = pdfWidth;
     const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
     let position = 0;
     let remainingHeight = imgHeight;
 
@@ -75,6 +78,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white w-full max-w-4xl my-8 rounded-lg shadow-2xl overflow-y-auto max-h-[95vh]">
+        {/* Header */}
         <div className="p-4 border-b border-gray-200 flex justify-between items-center print:hidden">
           <h2 className="text-xl font-bold text-gray-900">Preview Invoice</h2>
           <div className="flex gap-2">
@@ -99,35 +103,25 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
           </div>
         </div>
 
+        {/* Content */}
         <div className="p-6 print:p-12" ref={invoiceRef} id="invoice-content">
           <div className="border-4 border-orange-600 rounded-lg p-6">
+            {/* Header Invoice */}
             <div className="flex items-start justify-between mb-6 pb-4 border-b-2 border-orange-600">
               <div>
-                <img 
-                  src="logo.png" 
-                  alt="Logo Laju Tuju" 
-                  className="w-44 h-44 object-contain block"
-                />
+                <img src="logo.png" alt="Logo Laju Tuju" className="w-44 h-44 object-contain block" />
                 <div className="text-sm text-gray-600 leading-tight mt-2">
                   <p>Soka Asri Permai, Kadisoka, Purwomartani, Kalasan Sleman</p>
                   <p>Telp: 082138568822</p>
                   <p>
                     Email: 
-                    <a 
-                      href="mailto:contact@lajutuju.com" 
-                      className="ml-1 text-blue-500 underline hover:text-blue-700"
-                    >
+                    <a href="mailto:contact@lajutuju.com" className="ml-1 text-blue-500 underline hover:text-blue-700">
                       contact@lajutuju.com
                     </a>
                   </p>
                   <p>
                     Website: 
-                    <a 
-                      href="https://lajutuju.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="ml-1 text-blue-500 underline hover:text-blue-700"
-                    >
+                    <a href="https://lajutuju.com" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 underline hover:text-blue-700">
                       lajutuju.com
                     </a>
                   </p>
@@ -137,17 +131,18 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">INVOICE</h2>
                 <div className="text-sm space-y-1">
                   <p className="text-gray-600">
-                    <span className="font-semibold">No. Invoice:</span><br/>
-                    <span className="font-mono text-gray-900">#{order.id.substring(0,8).toUpperCase()}</span>
+                    <span className="font-semibold">No. Invoice:</span><br />
+                    <span className="font-mono text-gray-900">#{order.id.substring(0, 8).toUpperCase()}</span>
                   </p>
                   <p className="text-gray-600">
-                    <span className="font-semibold">Tanggal:</span><br/>
+                    <span className="font-semibold">Tanggal:</span><br />
                     <span className="text-gray-900">{formatDate(order.order_date)}</span>
                   </p>
                 </div>
               </div>
             </div>
 
+            {/* Informasi Pelanggan & Periode */}
             <div className="grid grid-cols-2 gap-6 mb-6 pb-4 border-b border-gray-300">
               <div>
                 <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Informasi Pelanggan</h3>
@@ -168,6 +163,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             </div>
 
+            {/* Rincian Item */}
             <div className="mb-6">
               <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Rincian Item Sewa</h3>
               <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
@@ -183,7 +179,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   </thead>
                   <tbody>
                     {order.order_items.map((item, idx) => (
-                      <tr key={item.id} className={idx % 2 === 0 ? 'bg-white':'bg-gray-50'}>
+                      <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                         <td className="px-3 py-2 border-r border-b border-gray-300 text-sm font-medium text-gray-900">{item.car_type}</td>
                         <td className="px-3 py-2 border-r border-b border-gray-300 text-sm text-center text-gray-700">{item.quantity}</td>
                         <td className="px-3 py-2 border-r border-b border-gray-300 text-sm text-center text-gray-700">{item.days}</td>
@@ -196,6 +192,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             </div>
 
+            {/* Total Pembayaran */}
             <div className="flex justify-end mb-6">
               <div className="w-full max-w-md">
                 <div className="bg-orange-600 text-white p-4 rounded-lg flex justify-between items-center">
@@ -205,6 +202,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             </div>
 
+            {/* Informasi Pembayaran */}
             <div className="mb-6 pb-4 border-b border-gray-300">
               <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Informasi Pembayaran</h3>
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-gray-700 space-y-1">
@@ -214,15 +212,15 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             </div>
 
+            {/* Catatan */}
             {order.notes && (
               <div className="mb-6 pb-4 border-b border-gray-300">
                 <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Catatan</h3>
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-sm text-gray-700">
-                  {order.notes}
-                </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-sm text-gray-700">{order.notes}</div>
               </div>
             )}
 
+            {/* QR Code */}
             <div className="grid grid-cols-2 gap-6 text-center mb-4">
               <div>
                 <p className="text-sm text-gray-600 mb-2">Laju Tuju</p>
@@ -233,6 +231,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
         </div>
       </div>
 
+      {/* Print CSS */}
       <style>{`
         @media print {
           body * { visibility: hidden; }
