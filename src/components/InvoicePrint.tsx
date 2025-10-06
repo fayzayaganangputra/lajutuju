@@ -31,17 +31,16 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
   const handleDownloadPDF = async () => {
     if (!invoiceRef.current) return;
 
-    // Simpan style asli
+    // simpan style asli
     const originalWidth = invoiceRef.current.style.width;
     const originalMaxWidth = invoiceRef.current.style.maxWidth;
 
-    // Pastikan lebar elemen full agar tidak gepeng
-    invoiceRef.current.style.width = '100%';
+    // paksa layout desktop agar PDF tidak gepeng
+    invoiceRef.current.style.width = '800px';
     invoiceRef.current.style.maxWidth = 'none';
 
-    const scale = 3; // tinggi supaya tajam di HP
+    const scale = 3; // untuk tajam di HP
 
-    // Pakai 'as any' supaya TypeScript tidak complain
     const canvas = await html2canvas(invoiceRef.current, {
       scale,
       useCORS: true,
@@ -49,7 +48,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
       scrollY: -window.scrollY,
     } as any);
 
-    // Kembalikan style asli
+    // kembalikan style asli
     invoiceRef.current.style.width = originalWidth;
     invoiceRef.current.style.maxWidth = originalMaxWidth;
 
@@ -103,10 +102,10 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
           </div>
         </div>
 
-        {/* Content */}
+        {/* Invoice Content */}
         <div className="p-6 print:p-12" ref={invoiceRef} id="invoice-content">
-          <div className="border-4 border-orange-600 rounded-lg p-6">
-            {/* Header Invoice */}
+          <div className="border-4 border-orange-600 rounded-lg p-6" style={{ width: '100%' }}>
+            {/* Logo & Info */}
             <div className="flex items-start justify-between mb-6 pb-4 border-b-2 border-orange-600">
               <div>
                 <img src="logo.png" alt="Logo Laju Tuju" className="w-44 h-44 object-contain block" />
@@ -114,13 +113,13 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   <p>Soka Asri Permai, Kadisoka, Purwomartani, Kalasan Sleman</p>
                   <p>Telp: 082138568822</p>
                   <p>
-                    Email: 
+                    Email:{' '}
                     <a href="mailto:contact@lajutuju.com" className="ml-1 text-blue-500 underline hover:text-blue-700">
                       contact@lajutuju.com
                     </a>
                   </p>
                   <p>
-                    Website: 
+                    Website:{' '}
                     <a href="https://lajutuju.com" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 underline hover:text-blue-700">
                       lajutuju.com
                     </a>
@@ -131,34 +130,46 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">INVOICE</h2>
                 <div className="text-sm space-y-1">
                   <p className="text-gray-600">
-                    <span className="font-semibold">No. Invoice:</span><br />
+                    <span className="font-semibold">No. Invoice:</span>
+                    <br />
                     <span className="font-mono text-gray-900">#{order.id.substring(0, 8).toUpperCase()}</span>
                   </p>
                   <p className="text-gray-600">
-                    <span className="font-semibold">Tanggal:</span><br />
+                    <span className="font-semibold">Tanggal:</span>
+                    <br />
                     <span className="text-gray-900">{formatDate(order.order_date)}</span>
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Informasi Pelanggan & Periode */}
+            {/* Pelanggan & Periode */}
             <div className="grid grid-cols-2 gap-6 mb-6 pb-4 border-b border-gray-300">
               <div>
                 <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Informasi Pelanggan</h3>
                 <div className="space-y-1 text-sm">
                   <p className="text-gray-600 font-semibold">{order.customer_name}</p>
-                  <p className="text-gray-600"><span className="font-medium">Telepon:</span> {order.customer_phone}</p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Telepon:</span> {order.customer_phone}
+                  </p>
                   {order.customer_address && (
-                    <p className="text-gray-600"><span className="font-medium">Alamat:</span> {order.customer_address}</p>
+                    <p className="text-gray-600">
+                      <span className="font-medium">Alamat:</span> {order.customer_address}
+                    </p>
                   )}
                 </div>
               </div>
               <div>
                 <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Periode Sewa</h3>
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 space-y-1 text-sm">
-                  <p><span className="font-medium">Mulai:</span> <span className="font-semibold">{formatDate(order.rental_start_date)}</span></p>
-                  <p><span className="font-medium">Selesai:</span> <span className="font-semibold">{formatDate(order.rental_end_date)}</span></p>
+                  <p>
+                    <span className="font-medium">Mulai:</span>{' '}
+                    <span className="font-semibold">{formatDate(order.rental_start_date)}</span>
+                  </p>
+                  <p>
+                    <span className="font-medium">Selesai:</span>{' '}
+                    <span className="font-semibold">{formatDate(order.rental_end_date)}</span>
+                  </p>
                 </div>
               </div>
             </div>
@@ -167,9 +178,9 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
             <div className="mb-6">
               <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Rincian Item Sewa</h3>
               <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
-                <table className="w-full">
+                <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-orange-600 text-white text-sm font-semibold">
+                    <tr className="bg-orange-600 text-white font-semibold">
                       <th className="px-3 py-2 text-left border-r border-orange-500">Tipe Mobil</th>
                       <th className="px-3 py-2 text-center border-r border-orange-500">Unit</th>
                       <th className="px-3 py-2 text-center border-r border-orange-500">Hari</th>
@@ -180,11 +191,11 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   <tbody>
                     {order.order_items.map((item, idx) => (
                       <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="px-3 py-2 border-r border-b border-gray-300 text-sm font-medium text-gray-900">{item.car_type}</td>
-                        <td className="px-3 py-2 border-r border-b border-gray-300 text-sm text-center text-gray-700">{item.quantity}</td>
-                        <td className="px-3 py-2 border-r border-b border-gray-300 text-sm text-center text-gray-700">{item.days}</td>
-                        <td className="px-3 py-2 border-r border-b border-gray-300 text-sm text-right text-gray-700">{formatCurrency(item.daily_rate)}</td>
-                        <td className="px-3 py-2 border-b border-gray-300 text-sm text-right font-semibold text-gray-900">{formatCurrency(item.subtotal)}</td>
+                        <td className="px-3 py-2 border-r border-b border-gray-300 text-gray-900 font-medium">{item.car_type}</td>
+                        <td className="px-3 py-2 border-r border-b border-gray-300 text-center text-gray-700">{item.quantity}</td>
+                        <td className="px-3 py-2 border-r border-b border-gray-300 text-center text-gray-700">{item.days}</td>
+                        <td className="px-3 py-2 border-r border-b border-gray-300 text-right text-gray-700">{formatCurrency(item.daily_rate)}</td>
+                        <td className="px-3 py-2 border-b border-gray-300 text-right font-semibold text-gray-900">{formatCurrency(item.subtotal)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -206,9 +217,9 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
             <div className="mb-6 pb-4 border-b border-gray-300">
               <h3 className="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wide">Informasi Pembayaran</h3>
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-gray-700 space-y-1">
-                <p><span className="font-medium">Bank:</span> Mandiri</p>
-                <p><span className="font-medium">No. Rekening:</span> <span className="font-mono font-semibold">1370018835948</span></p>
-                <p><span className="font-medium">Atas Nama:</span> Fayzaya Ganang Putra</p>
+                <p><span className="font-medium">Bank:</span> BCA</p>
+                <p><span className="font-medium">No. Rekening:</span> <span className="font-mono font-semibold">4561059637</span></p>
+                <p><span className="font-medium">Atas Nama:</span> Moh Fajar Yogyaning Praharu</p>
               </div>
             </div>
 
