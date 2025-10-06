@@ -131,7 +131,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   <p>Soka Asri Permai, Kadisoka, Purwomartani, Kalasan Sleman</p>
                   <p>
                     Telp:{' '}
-                    <span className="no-underline decoration-none">{order.customer_phone}</span>
+                    <span style={{ textDecoration: 'none' }}>{order.customer_phone}</span>
                   </p>
                   <p>
                     Email:{' '}
@@ -153,12 +153,14 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   <p className="text-gray-600">
                     <span className="font-semibold">No. Invoice:</span>
                     <br />
-                    <span className="font-mono text-gray-900 no-underline decoration-none">#{order.id.substring(0, 8).toUpperCase()}</span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 600, textDecoration: 'none' }}>
+                      #{order.id.substring(0, 8).toUpperCase()}
+                    </span>
                   </p>
                   <p className="text-gray-600">
                     <span className="font-semibold">Tanggal:</span>
                     <br />
-                    <span className="text-gray-900">{formatDate(order.order_date)}</span>
+                    <span>{formatDate(order.order_date)}</span>
                   </p>
                 </div>
               </div>
@@ -172,7 +174,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                   <p className="text-gray-600 font-semibold">{order.customer_name}</p>
                   <p className="text-gray-600">
                     <span className="font-medium">Telepon:</span>{' '}
-                    <span className="no-underline decoration-none">{order.customer_phone}</span>
+                    <span style={{ textDecoration: 'none' }}>{order.customer_phone}</span>
                   </p>
                   {order.customer_address && (
                     <p className="text-gray-600">
@@ -242,7 +244,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                 <p><span className="font-medium">Bank:</span> BCA</p>
                 <p>
                   <span className="font-medium">No. Rekening:</span>{' '}
-                  <span className="font-mono font-semibold no-underline decoration-none">4561059637</span>
+                  <span style={{ fontFamily: 'monospace', fontWeight: 600, textDecoration: 'none' }}>4561059637</span>
                 </p>
                 <p><span className="font-medium">Atas Nama:</span> Moh Fajar Yogyaning Praharu</p>
               </div>
