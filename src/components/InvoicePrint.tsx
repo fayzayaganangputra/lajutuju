@@ -122,7 +122,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
                 <img src="logo.png" alt="Logo Laju Tuju" className="w-44 h-auto object-contain block" />
                 <div className="text-sm text-gray-600 leading-tight mt-2">
                   <p>Soka Asri Permai, Kadisoka, Purwomartani, Kalasan Sleman</p>
-                  <p>Telp: <span className="no-underline-numbers">{order.customer_phone}</span></p>
+                  <p>Telp: <span className="no-underline-numbers">+62 821-3856-8822</span></p>
                   <p>Email: <a href="mailto:contact@lajutuju.com" className="ml-1 text-blue-500 underline hover:text-blue-700">contact@lajutuju.com</a></p>
                   <p>Website: <a href="https://lajutuju.com" target="_blank" rel="noopener noreferrer" className="ml-1 text-blue-500 underline hover:text-blue-700">lajutuju.com</a></p>
                 </div>
