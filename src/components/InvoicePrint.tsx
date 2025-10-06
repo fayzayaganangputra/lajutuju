@@ -31,47 +31,71 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
   const handleDownloadPDF = async () => {
     if (!invoiceRef.current) return;
 
+    const invoiceElement = invoiceRef.current;
+
     // simpan style asli
-    const originalWidth = invoiceRef.current.style.width;
-    const originalMaxWidth = invoiceRef.current.style.maxWidth;
+    const originalStyles = { ...invoiceElement.style };
 
-    // paksa layout desktop agar PDF tidak gepeng
-    invoiceRef.current.style.width = '800px';
-    invoiceRef.current.style.maxWidth = 'none';
+    // paksa layout agar PDF tidak gepeng
+    invoiceElement.style.position = 'absolute';
+    invoiceElement.style.left = '-9999px';
+    invoiceElement.style.top = '0';
+    invoiceElement.style.width = '794px';
+    invoiceElement.style.maxWidth = 'none';
+    invoiceElement.style.zIndex = '-1';
+    invoiceElement.style.transform = 'scale(1)';
 
-    const scale = 3; // untuk tajam di HP
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-    const canvas = await html2canvas(invoiceRef.current, {
-      scale,
-      useCORS: true,
-      allowTaint: true,
-      scrollY: -window.scrollY,
-    } as any);
+    try {
+      // gunakan "as any" untuk mengatasi error scale di TypeScript
+      const canvas = await html2canvas(invoiceElement, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        width: 794,
+        windowWidth: 794,
+        backgroundColor: '#ffffff',
+      } as any);
 
-    // kembalikan style asli
-    invoiceRef.current.style.width = originalWidth;
-    invoiceRef.current.style.maxWidth = originalMaxWidth;
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true,
+      });
 
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const ratio = canvasWidth / canvasHeight;
+      const width = pdfWidth;
+      const height = width / ratio;
 
-    const imgWidth = pdfWidth;
-    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      let heightLeft = height;
+      let position = 0;
 
-    let position = 0;
-    let remainingHeight = imgHeight;
+      pdf.addImage(imgData, 'PNG', 0, position, width, height, '', 'FAST');
+      heightLeft -= pdfHeight;
 
-    while (remainingHeight > 0) {
-      const heightToPrint = remainingHeight > pdfHeight ? pdfHeight : remainingHeight;
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, heightToPrint);
-      remainingHeight -= pdfHeight;
-      position -= pdfHeight;
-      if (remainingHeight > 0) pdf.addPage();
+      while (heightLeft > 0) {
+        position = heightLeft - height;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, width, height, '', 'FAST');
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save(`Invoice-${order.id.substring(0, 8).toUpperCase()}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Gagal membuat PDF. Silakan coba lagi.');
+    } finally {
+      // kembalikan style asli
+      Object.assign(invoiceElement.style, originalStyles);
     }
-
-    pdf.save(`Invoice-${order.id}.pdf`);
   };
 
   return (
@@ -203,7 +227,7 @@ export default function InvoicePrint({ order, onClose }: InvoicePrintProps) {
               </div>
             </div>
 
-            {/* Total Pembayaran */}
+            {/* Total */}
             <div className="flex justify-end mb-6">
               <div className="w-full max-w-md">
                 <div className="bg-orange-600 text-white p-4 rounded-lg flex justify-between items-center">
